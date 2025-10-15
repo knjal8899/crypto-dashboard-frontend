@@ -103,7 +103,8 @@ const MarketOverview: React.FC = () => {
       title: 'Active Coins',
       value: (() => {
         const coinsArray = Array.isArray((marketData as any)?.coins) ? (marketData as any).coins : []
-        const activeCount = Number((marketData as any)?.active_cryptocurrencies) || 
+        const activeCount = Number((marketData as any)?.activeCoins) || 
+                           Number((marketData as any)?.active_cryptocurrencies) || 
                            Number((marketData as any)?.active_cryptocurrencies_count) || 
                            coinsArray.length || 
                            coins.length || 

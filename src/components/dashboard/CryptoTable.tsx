@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TrendingUp, TrendingDown, Star, StarOff, Plus, Minus } from 'lucide-react'
 import { formatCurrency, formatPercentage, formatMarketCap, formatVolume } from '@/utils/format'
-import { useTopCoins, useAddToWatchlist, useRemoveFromWatchlist } from '@/hooks'
+import { useTopCoins, useAddToWatchlist, useRemoveFromWatchlist, useWatchlist } from '@/hooks'
 import { Button, Badge, Skeleton, SkeletonTable } from '@/components/ui'
 import { CryptoCoin } from '@/types'
 
@@ -22,8 +22,24 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
   const navigate = useNavigate()
   const [watchlist, setWatchlist] = useState<string[]>([])
   const { data: coins, isLoading, error } = useTopCoins(limit)
+  const { data: watchlistData } = useWatchlist()
   const addToWatchlistMutation = useAddToWatchlist()
   const removeFromWatchlistMutation = useRemoveFromWatchlist()
+
+  // Sync local watchlist state with backend data
+  useEffect(() => {
+    if (watchlistData) {
+      if (Array.isArray(watchlistData)) {
+        if (watchlistData.length > 0 && typeof watchlistData[0] === 'string') {
+          // Array of IDs: ["bitcoin", "ethereum", ...]
+          setWatchlist(watchlistData)
+        } else {
+          // Array of coin objects: extract IDs
+          setWatchlist(watchlistData.map((coin: any) => coin.id).filter(Boolean))
+        }
+      }
+    }
+  }, [watchlistData])
 
   const handleCoinClick = (coinId: string) => {
     navigate(`/coin/${coinId}`)
