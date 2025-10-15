@@ -2,7 +2,7 @@ import React from 'react'
 import { TrendingUp, TrendingDown, DollarSign, BarChart3 } from 'lucide-react'
 import { formatCurrency, formatPercentage, formatMarketCap } from '@/utils/format'
 import { useMarketData } from '@/hooks'
-import { Card, CardContent, CardHeader, CardTitle, LoadingSpinner, Skeleton } from '@/components/ui'
+import { Card, CardContent, CardHeader, CardTitle, LoadingSpinner, Skeleton, InfoIcon } from '@/components/ui'
 
 const MarketOverview: React.FC = () => {
   const { data: marketData, isLoading, error } = useMarketData()
@@ -82,6 +82,7 @@ const MarketOverview: React.FC = () => {
       change: marketCapChangePercentage24h,
       icon: DollarSign,
       color: 'text-blue-600 dark:text-blue-400',
+      description: 'The total value of all cryptocurrencies in the market. Calculated by multiplying each coin\'s price by its circulating supply.',
     },
     {
       title: '24h Volume',
@@ -89,6 +90,7 @@ const MarketOverview: React.FC = () => {
       change: 0, // Volume change not provided in the data
       icon: BarChart3,
       color: 'text-green-600 dark:text-green-400',
+      description: 'The total trading volume across all cryptocurrencies in the last 24 hours. Higher volume indicates more market activity.',
     },
     {
       title: 'Market Change',
@@ -98,6 +100,7 @@ const MarketOverview: React.FC = () => {
       color: isMarketPositive 
         ? 'text-green-600 dark:text-green-400' 
         : 'text-red-600 dark:text-red-400',
+      description: 'The percentage change in total market capitalization over the last 24 hours. Shows overall market sentiment.',
     },
     {
       title: 'Active Coins',
@@ -114,6 +117,7 @@ const MarketOverview: React.FC = () => {
       change: 0,
       icon: TrendingUp,
       color: 'text-purple-600 dark:text-purple-400',
+      description: 'The total number of cryptocurrencies currently being tracked and traded in the market.',
     },
   ]
 
@@ -126,9 +130,12 @@ const MarketOverview: React.FC = () => {
         return (
           <Card key={index} className="hover:shadow-lg transition-shadow duration-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {stat.title}
-              </CardTitle>
+              <div className="flex items-center space-x-2">
+                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  {stat.title}
+                </CardTitle>
+                <InfoIcon content={stat.description} />
+              </div>
               <Icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
             <CardContent>

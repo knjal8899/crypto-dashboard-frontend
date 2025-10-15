@@ -6,7 +6,7 @@ import CryptoTable from '@/components/dashboard/CryptoTable'
 import PriceChart from '@/components/dashboard/PriceChart'
 import ChatAssistant from '@/components/chat/ChatAssistant'
 import { useTopCoins, useGainersLosers } from '@/hooks'
-import { Card, CardContent, CardHeader, CardTitle, Button, LoadingSpinner } from '@/components/ui'
+import { Card, CardContent, CardHeader, CardTitle, Button, LoadingSpinner, InfoIcon } from '@/components/ui'
 import { formatPercentage } from '@/utils/format'
 
 const Dashboard: React.FC = () => {
@@ -171,6 +171,7 @@ const Dashboard: React.FC = () => {
                 <CardTitle className="flex items-center space-x-2 text-lg">
                   <BarChart3 className="h-5 w-5" />
                   <span>Top Cryptocurrencies</span>
+                  <InfoIcon content="The top cryptocurrencies ranked by market capitalization. Click on any coin to view detailed information and price charts. Use the star icon to add coins to your watchlist." />
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -192,7 +193,7 @@ const Dashboard: React.FC = () => {
               <ChatAssistant 
                 isOpen={showChat}
                 onClose={() => setShowChat(false)}
-                className="h-80 shadow-lg"
+                className="min-h-80 max-h-96 shadow-lg"
               />
               {!showChat && (
                 <Button
@@ -214,6 +215,7 @@ const Dashboard: React.FC = () => {
                 <CardTitle className="flex items-center space-x-2 text-lg">
                   <TrendingUp className="h-5 w-5 text-green-600" />
                   <span>Top Gainers</span>
+                  <InfoIcon content="Cryptocurrencies with the highest percentage gains in the last 24 hours. These coins are performing better than the market average." />
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -260,6 +262,7 @@ const Dashboard: React.FC = () => {
                 <CardTitle className="flex items-center space-x-2 text-lg">
                   <TrendingDown className="h-5 w-5 text-red-600" />
                   <span>Top Losers</span>
+                  <InfoIcon content="Cryptocurrencies with the highest percentage losses in the last 24 hours. These coins are underperforming compared to the market average." />
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">

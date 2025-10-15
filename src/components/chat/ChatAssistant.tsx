@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Send, Bot, User, Loader2, MessageSquare, X } from 'lucide-react'
 import { useSendMessage, useChatSuggestions, useChatQuery } from '@/hooks'
-import { Button, Input, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
+import { Button, Input, Card, CardContent, CardHeader, CardTitle, InfoIcon } from '@/components/ui'
 import { ChatMessage, ChatRequest } from '@/types'
 import { formatRelativeTime } from '@/utils/format'
 
@@ -129,6 +129,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({
         <div className="flex items-center space-x-2">
           <Bot className="h-5 w-5 text-primary-600" />
           <CardTitle className="text-lg">Crypto Assistant</CardTitle>
+          <InfoIcon content="Ask me about cryptocurrency prices, market trends, and analysis. I can help you understand market data and provide insights about different coins." />
         </div>
         {onClose && (
           <Button
@@ -144,7 +145,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({
       
       <CardContent className="flex-1 flex flex-col space-y-4">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto space-y-4 max-h-96">
+        <div className="flex-1 overflow-y-auto space-y-4 min-h-0">
           {messages.map((message) => (
             <div
               key={message.id}
