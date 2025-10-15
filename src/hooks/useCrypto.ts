@@ -199,3 +199,21 @@ export function useRemoveFromPortfolio() {
     },
   })
 }
+
+export function useCoinDetail(id: string) {
+  return useQuery({
+    queryKey: QUERY_KEYS.CRYPTO.COIN_BY_ID(id),
+    queryFn: () => cryptoService.getCoinDetail(id),
+    enabled: !!id,
+    staleTime: 30000,
+  })
+}
+
+export function useCoinPriceHistory(id: string, range: '1d' | '7d' | '30d' | '90d' | '1y' = '7d') {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.CRYPTO.PRICE_HISTORY(id, range)],
+    queryFn: () => cryptoService.getCoinPriceHistory(id, range),
+    enabled: !!id,
+    staleTime: 60000,
+  })
+}

@@ -75,4 +75,15 @@ export const cryptoService = {
   async removeFromPortfolio(id: string): Promise<void> {
     return apiClient.delete<void>(`/coins/portfolio/${id}`)
   },
+
+  async getCoinDetail(id: string): Promise<any> {
+    return apiClient.get<any>(`/coins/${id}/detail`)
+  },
+
+  async getCoinPriceHistory(
+    id: string,
+    range: '1d' | '7d' | '30d' | '90d' | '1y' = '7d'
+  ): Promise<any> {
+    return apiClient.get<any>(`/coins/${id}/price-history?range=${range}`)
+  },
 }

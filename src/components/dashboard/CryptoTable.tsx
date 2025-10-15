@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { TrendingUp, TrendingDown, Star, StarOff, Plus, Minus } from 'lucide-react'
 import { formatCurrency, formatPercentage, formatMarketCap, formatVolume } from '@/utils/format'
 import { useTopCoins, useAddToWatchlist, useRemoveFromWatchlist } from '@/hooks'
@@ -19,10 +19,15 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
   className,
   onCoinSelect
 }) => {
+  const navigate = useNavigate()
   const [watchlist, setWatchlist] = useState<string[]>([])
   const { data: coins, isLoading, error } = useTopCoins(limit)
   const addToWatchlistMutation = useAddToWatchlist()
   const removeFromWatchlistMutation = useRemoveFromWatchlist()
+
+  const handleCoinClick = (coinId: string) => {
+    navigate(`/coin/${coinId}`)
+  }
 
   const handleWatchlistToggle = async (coinId: string) => {
     const isInWatchlist = watchlist.includes(coinId)
@@ -115,7 +120,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
                   <td className="py-4 px-4">
                     <div
                       className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer"
-                      onClick={() => onCoinSelect?.(coin.id)}
+                      onClick={() => handleCoinClick(coin.id)}
                     >
                       <img
                         src={coin.image || `data:image/svg+xml;base64,${btoa(`<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="#6366f1"/><text x="16" y="20" text-anchor="middle" fill="white" font-family="Arial" font-size="14" font-weight="bold">${(coin.symbol || '?').charAt(0)}</text></svg>`)}`}

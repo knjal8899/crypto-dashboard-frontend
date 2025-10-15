@@ -14,6 +14,7 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import Dashboard from '@/pages/Dashboard'
+import CoinDetail from '@/pages/CoinDetail'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -67,6 +68,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/coin/:coinId"
+                  element={
+                    <ProtectedRoute>
+                      <CoinDetail />
                     </ProtectedRoute>
                   }
                 />
