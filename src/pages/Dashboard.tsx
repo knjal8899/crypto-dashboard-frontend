@@ -5,6 +5,7 @@ import MarketOverview from '@/components/dashboard/MarketOverview'
 import CryptoTable from '@/components/dashboard/CryptoTable'
 import PriceChart from '@/components/dashboard/PriceChart'
 import ChatAssistant from '@/components/chat/ChatAssistant'
+import BackendTest from '@/components/BackendTest'
 import { useTopCoins, useGainersLosers } from '@/hooks'
 import { Card, CardContent, CardHeader, CardTitle, Button, LoadingSpinner } from '@/components/ui'
 import { formatCurrency, formatPercentage } from '@/utils/format'
@@ -72,13 +73,52 @@ const Dashboard: React.FC = () => {
         <Header />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                No cryptocurrency data available
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-500">
-                Please ensure your backend is running and providing data
-              </p>
+            <div className="text-center max-w-md">
+              <div className="mb-6">
+                <div className="w-16 h-16 mx-auto mb-4 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  No cryptocurrency data available
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  The dashboard couldn't fetch data from the backend. This usually means:
+                </p>
+                <ul className="text-sm text-gray-500 dark:text-gray-500 text-left space-y-1 mb-6">
+                  <li>• Backend server is not running on port 8000</li>
+                  <li>• API endpoints are not responding</li>
+                  <li>• Network connection issues</li>
+                  <li>• Authentication token issues</li>
+                </ul>
+              </div>
+              <div className="space-y-3">
+                <Button 
+                  onClick={() => window.location.reload()}
+                  className="w-full"
+                >
+                  Retry Connection
+                </Button>
+                <Button 
+                  onClick={() => {
+                    console.log('Current API Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api')
+                    console.log('Current tokens:', {
+                      accessToken: localStorage.getItem('accessToken'),
+                      refreshToken: localStorage.getItem('refreshToken')
+                    })
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Debug Info (Check Console)
+                </Button>
+              </div>
+              
+              {/* Backend Test Component */}
+              <div className="mt-8">
+                <BackendTest />
+              </div>
             </div>
           </div>
         </main>

@@ -122,8 +122,16 @@ class ApiClient {
   }
 
   public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    const response: AxiosResponse<T> = await this.instance.get(url, config)
-    return response.data
+    try {
+      console.log('Making GET request to:', url)
+      console.log('Full URL:', `${this.instance.defaults.baseURL}${url}`)
+      const response: AxiosResponse<T> = await this.instance.get(url, config)
+      console.log('GET response:', response.data)
+      return response.data
+    } catch (error) {
+      console.error('GET request failed:', error)
+      throw error
+    }
   }
 
   public async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {

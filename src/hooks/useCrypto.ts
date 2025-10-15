@@ -22,11 +22,14 @@ export function useTopCoins(limit: number = 10) {
         }
       } catch (error) {
         console.error('Error fetching top coins:', error)
-        throw error
+        // Return empty array instead of throwing to prevent UI crashes
+        return []
       }
     },
     staleTime: 30000, // 30 seconds
     refetchInterval: 60000, // 1 minute
+    retry: 1, // Only retry once
+    retryDelay: 2000, // Wait 2 seconds before retry
   })
 }
 

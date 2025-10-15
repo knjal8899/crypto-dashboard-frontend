@@ -3,7 +3,16 @@ import { CryptoCoin, CryptoChartData, CryptoMarketData, CryptoSearchResult, Cryp
 
 export const cryptoService = {
   async getTopCoins(limit: number = 10): Promise<CryptoCoin[]> {
-    return apiClient.get<CryptoCoin[]>(`/coins/top?limit=${limit}`)
+    console.log('Fetching top coins with limit:', limit)
+    console.log('API Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api')
+    try {
+      const result = await apiClient.get<CryptoCoin[]>(`/coins/top?limit=${limit}`)
+      console.log('Top coins result:', result)
+      return result
+    } catch (error) {
+      console.error('Error in getTopCoins:', error)
+      throw error
+    }
   },
 
   async getCoinById(id: string): Promise<CryptoCoin> {
