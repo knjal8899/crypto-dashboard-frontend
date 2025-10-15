@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Send, Bot, User, Loader2, MessageSquare, X } from 'lucide-react'
-import { useSendMessage, useChatSuggestions } from '@/hooks'
+import { useSendMessage, useChatSuggestions, useChatQuery } from '@/hooks'
 import { Button, Input, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { ChatMessage, ChatRequest } from '@/types'
 import { formatRelativeTime } from '@/utils/format'
@@ -29,6 +29,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
   const sendMessageMutation = useSendMessage()
+  const queryMutation = useChatQuery()
   const { data: suggestions } = useChatSuggestions()
 
   const scrollToBottom = () => {
@@ -53,6 +54,22 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({
     setInputValue('')
 
     try {
+      // Try GET /chat/query first for Q&A coin search
+      const qa = await queryMutation.mutateAsync(userMessage.content)
+      if (qa && (qa.answer || qa.prices)) {
+        const answerText = qa.answer || 'Here is the data you requested.'
+        const assistantMsg: ChatMessage = {
+          id: Date.now().toString(),
+          content: answerText,
+          role: 'assistant',
+          timestamp: new Date().toISOString(),
+          metadata: qa,
+        }
+        setMessages(prev => [...prev, assistantMsg])
+        return
+      }
+
+      // Fallback to POST /chat/message session-based chat
       const request: ChatRequest = {
         message: userMessage.content,
         sessionId: sessionId || undefined,

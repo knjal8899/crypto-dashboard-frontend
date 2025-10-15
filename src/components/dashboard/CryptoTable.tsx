@@ -175,8 +175,10 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleWatchlistToggle(coin.id)}
+                        onClick={(e) => { e.stopPropagation(); handleWatchlistToggle(coin.id) }}
                         className="p-2"
+                        aria-label={isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
+                        title={isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
                       >
                         {isInWatchlist ? (
                           <Star className="w-4 h-4 text-yellow-500 fill-current" />

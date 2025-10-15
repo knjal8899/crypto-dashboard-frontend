@@ -6,6 +6,12 @@ export const chatService = {
     return apiClient.post<ChatResponse>('/chat/message', request)
   },
 
+  async query(text: string): Promise<any> {
+    // GET /api/chat/query?text=...
+    const encoded = encodeURIComponent(text)
+    return apiClient.get<any>(`/chat/query?text=${encoded}`)
+  },
+
   async getSessions(): Promise<ChatSession[]> {
     return apiClient.get<ChatSession[]>('/chat/sessions')
   },
@@ -27,7 +33,8 @@ export const chatService = {
   },
 
   async getSuggestions(): Promise<string[]> {
-    return apiClient.get<string[]>('/chat/suggestions')
+    const res = await apiClient.get<{ suggestions: string[] }>('/chat/suggestions')
+    return Array.isArray(res?.suggestions) ? res.suggestions : []
   },
 
   async getPopularQueries(): Promise<string[]> {

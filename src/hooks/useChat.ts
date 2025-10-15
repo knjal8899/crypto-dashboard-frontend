@@ -36,6 +36,12 @@ export function usePopularQueries() {
   })
 }
 
+export function useChatQuery() {
+  return useMutation({
+    mutationFn: (text: string) => chatService.query(text),
+  })
+}
+
 export function useSendMessage() {
   const queryClient = useQueryClient()
   
