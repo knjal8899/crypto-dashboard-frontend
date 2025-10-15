@@ -11,7 +11,7 @@ import {
   AreaChart,
 } from 'recharts'
 import { TrendingUp, TrendingDown, Calendar } from 'lucide-react'
-import { formatCurrency, formatDate } from '@/utils/format'
+import { formatCurrency, formatDate, formatPercentage } from '@/utils/format'
 import { useCoinPriceHistory } from '@/hooks'
 import { Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner, Skeleton } from '@/components/ui'
 import { CHART_TIME_RANGES, CHART_COLORS } from '@/utils/constants'
