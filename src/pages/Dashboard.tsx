@@ -186,13 +186,13 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Right Column - Sidebar */}
-          <div className="space-y-6">
-            {/* Chat Assistant - more compact */}
-            <div className="sticky top-4">
+          <div className="space-y-8">
+            {/* Chat Assistant - better contained */}
+            <div className="sticky top-4 z-10">
               <ChatAssistant 
                 isOpen={showChat}
                 onClose={() => setShowChat(false)}
-                className="h-80"
+                className="h-80 shadow-lg"
               />
               {!showChat && (
                 <Button

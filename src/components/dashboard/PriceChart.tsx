@@ -83,6 +83,16 @@ const PriceChart: React.FC<PriceChartProps> = ({
     return formatCurrency(value)
   }
 
+  const formatYAxisValue = (value: number) => {
+    if (value >= 1000000) {
+      return `$${(value / 1000000).toFixed(1)}M`
+    } else if (value >= 1000) {
+      return `$${(value / 1000).toFixed(1)}K`
+    } else {
+      return `$${value.toFixed(0)}`
+    }
+  }
+
   const formatTooltipLabel = (label: number) => {
     return formatDate(new Date(label), 'MMM dd, yyyy HH:mm')
   }
@@ -267,7 +277,7 @@ const PriceChart: React.FC<PriceChartProps> = ({
 
         {/* Chart */}
         <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
             {chartType === 'area' ? (
               <AreaChart data={normalizedPrices}>
                 <defs>
@@ -290,8 +300,10 @@ const PriceChart: React.FC<PriceChartProps> = ({
                   return Number.isNaN(date.getTime()) ? '' : formatDate(date, 'MMM dd')
                 }} stroke="#6b7280" />
                 <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
+                  tickFormatter={formatYAxisValue}
                   stroke="#6b7280"
+                  width={60}
+                  tick={{ fontSize: 12 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Area
@@ -311,8 +323,10 @@ const PriceChart: React.FC<PriceChartProps> = ({
                   return Number.isNaN(date.getTime()) ? '' : formatDate(date, 'MMM dd')
                 }} stroke="#6b7280" />
                 <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
+                  tickFormatter={formatYAxisValue}
                   stroke="#6b7280"
+                  width={60}
+                  tick={{ fontSize: 12 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Line

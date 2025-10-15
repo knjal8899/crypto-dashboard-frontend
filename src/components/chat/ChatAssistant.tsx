@@ -213,8 +213,8 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({
 
         {/* Suggestions */}
         {suggestions && suggestions.length > 0 && messages.length === 1 && (
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="space-y-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
               Try asking:
             </p>
             <div className="flex flex-wrap gap-2">
@@ -224,7 +224,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({
                   variant="outline"
                   size="sm"
                   onClick={() => handleSuggestionClick(suggestion)}
-                  className="text-xs"
+                  className="text-xs bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
                   {suggestion}
                 </Button>
