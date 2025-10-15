@@ -223,6 +223,24 @@ const Dashboard: React.FC = () => {
 
           {/* Right Column - Sidebar */}
           <div className="space-y-8">
+            {/* Move Chat Assistant above Gainers */}
+            <div className="sticky top-8">
+              <ChatAssistant 
+                isOpen={showChat}
+                onClose={() => setShowChat(false)}
+                className="h-96"
+              />
+              {!showChat && (
+                <Button
+                  onClick={() => setShowChat(true)}
+                  className="w-full"
+                  variant="outline"
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  Open Chat Assistant
+                </Button>
+              )}
+            </div>
             {/* Quick Stats section removed as requested */}
 
             {/* Top Gainers */}
@@ -317,24 +335,7 @@ const Dashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Chat Assistant */}
-            <div className="sticky top-8">
-              <ChatAssistant 
-                isOpen={showChat}
-                onClose={() => setShowChat(false)}
-                className="h-96"
-              />
-              {!showChat && (
-                <Button
-                  onClick={() => setShowChat(true)}
-                  className="w-full"
-                  variant="outline"
-                >
-                  <Star className="h-4 w-4 mr-2" />
-                  Open Chat Assistant
-                </Button>
-              )}
-            </div>
+            {/* Chat block moved above; removed duplicate */}
           </div>
         </div>
       </main>

@@ -54,21 +54,23 @@ const MarketOverview: React.FC = () => {
     // If marketData is an array of coins (like top coins)
     coins = marketData
     totalMarketCap = coins.reduce((sum, coin) => {
-      const marketCap = parseFloat(coin.last_price_usd || coin.currentPrice || coin.price || 0) * 
-                       parseFloat(coin.circulating_supply || coin.circulatingSupply || 1000000)
-      return sum + marketCap
+      const price = Number(coin.last_price_usd ?? coin.currentPrice ?? coin.price ?? 0)
+      const supply = Number(coin.circulating_supply ?? coin.circulatingSupply ?? 0)
+      const mc = Number.isFinite(price * supply) ? price * supply : 0
+      return sum + mc
     }, 0)
     totalVolume = coins.reduce((sum, coin) => {
-      return sum + parseFloat(coin.last_volume_24h_usd || coin.totalVolume || coin.volume_24h || 0)
+      const vol = Number(coin.last_volume_24h_usd ?? coin.totalVolume ?? coin.volume_24h ?? 0)
+      return sum + (Number.isFinite(vol) ? vol : 0)
     }, 0)
     marketCapChangePercentage24h = coins.length > 0 ? 
       coins.reduce((sum, coin) => sum + parseFloat(coin.last_pct_change_24h || coin.priceChangePercentage24h || 0), 0) / coins.length : 0
   } else if (marketData && typeof marketData === 'object') {
     // If marketData is an object with aggregated data
-    coins = marketData.coins || []
-    totalMarketCap = marketData.totalMarketCap || marketData.total_market_cap || marketData.market_cap || 0
-    totalVolume = marketData.totalVolume || marketData.total_volume || marketData.volume_24h || 0
-    marketCapChangePercentage24h = marketData.marketCapChangePercentage24h || marketData.market_cap_change_percentage_24h || 0
+    coins = Array.isArray((marketData as any).coins) ? (marketData as any).coins : []
+    totalMarketCap = Number((marketData as any).totalMarketCap ?? (marketData as any).total_market_cap ?? (marketData as any).market_cap ?? 0)
+    totalVolume = Number((marketData as any).totalVolume ?? (marketData as any).total_volume ?? (marketData as any).volume_24h ?? 0)
+    marketCapChangePercentage24h = Number((marketData as any).marketCapChangePercentage24h ?? (marketData as any).market_cap_change_percentage_24h ?? 0)
   }
 
   const isMarketPositive = marketCapChangePercentage24h >= 0
@@ -99,7 +101,13 @@ const MarketOverview: React.FC = () => {
     },
     {
       title: 'Active Coins',
-      value: coins.length.toString(),
+      value: (
+        (Array.isArray((marketData as any)?.coins) ? (marketData as any).coins.length : undefined)
+        ?? Number((marketData as any)?.active_cryptocurrencies)
+        ?? Number((marketData as any)?.active_cryptocurrencies_count)
+        ?? coins.length
+        ?? 0
+      ).toString(),
       change: 0,
       icon: TrendingUp,
       color: 'text-purple-600 dark:text-purple-400',
