@@ -1,10 +1,14 @@
 import { format, formatDistanceToNow, parseISO } from 'date-fns'
 
 export const formatCurrency = (
-  value: number,
+  value: number | undefined | null,
   currency: string = 'USD',
   locale: string = 'en-US'
 ): string => {
+  if (value === undefined || value === null || isNaN(value)) {
+    return 'N/A'
+  }
+  
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
@@ -31,12 +35,16 @@ export const formatNumber = (
 }
 
 export const formatPercentage = (
-  value: number,
+  value: number | undefined | null,
   options: {
     signDisplay?: 'auto' | 'never' | 'always' | 'exceptZero'
     maximumFractionDigits?: number
   } = {}
 ): string => {
+  if (value === undefined || value === null || isNaN(value)) {
+    return 'N/A'
+  }
+  
   const { signDisplay = 'auto', maximumFractionDigits = 2 } = options
   
   return new Intl.NumberFormat('en-US', {
@@ -46,7 +54,11 @@ export const formatPercentage = (
   }).format(value / 100)
 }
 
-export const formatMarketCap = (value: number): string => {
+export const formatMarketCap = (value: number | undefined | null): string => {
+  if (value === undefined || value === null || isNaN(value)) {
+    return 'N/A'
+  }
+  
   if (value >= 1e12) {
     return `$${(value / 1e12).toFixed(2)}T`
   } else if (value >= 1e9) {
@@ -59,7 +71,11 @@ export const formatMarketCap = (value: number): string => {
   return `$${value.toFixed(2)}`
 }
 
-export const formatVolume = (value: number): string => {
+export const formatVolume = (value: number | undefined | null): string => {
+  if (value === undefined || value === null || isNaN(value)) {
+    return 'N/A'
+  }
+  
   if (value >= 1e9) {
     return `$${(value / 1e9).toFixed(2)}B`
   } else if (value >= 1e6) {

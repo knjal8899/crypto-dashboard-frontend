@@ -101,7 +101,10 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
           </thead>
           <tbody>
             {coins.map((coin) => {
-              const isPositive = coin.priceChangePercentage24h >= 0
+              // Debug: Log the coin structure to understand the data format
+              console.log('Coin data structure:', coin)
+              
+              const isPositive = (coin.priceChangePercentage24h || 0) >= 0
               const isInWatchlist = watchlist.includes(coin.id)
               
               return (
@@ -110,7 +113,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
                   className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                 >
                   <td className="py-4 px-4 text-sm text-gray-600 dark:text-gray-400">
-                    {coin.marketCapRank}
+                    {coin.marketCapRank || coin.rank || 'N/A'}
                   </td>
                   <td className="py-4 px-4">
                     <div
@@ -118,27 +121,27 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
                       onClick={() => onCoinSelect?.(coin.id)}
                     >
                       <img
-                        src={coin.image}
-                        alt={coin.name}
+                        src={coin.image || `https://via.placeholder.com/32x32/6366f1/ffffff?text=${(coin.symbol || '?').charAt(0)}`}
+                        alt={coin.name || 'Unknown'}
                         className="w-8 h-8 rounded-full"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
-                          target.src = `https://via.placeholder.com/32x32/6366f1/ffffff?text=${coin.symbol.charAt(0)}`
+                          target.src = `https://via.placeholder.com/32x32/6366f1/ffffff?text=${(coin.symbol || '?').charAt(0)}`
                         }}
                       />
                       <div>
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {coin.name}
+                          {coin.name || 'Unknown'}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {coin.symbol.toUpperCase()}
+                          {(coin.symbol || '?').toUpperCase()}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="py-4 px-4 text-right">
                     <div className="font-medium text-gray-900 dark:text-white">
-                      {formatCurrency(coin.currentPrice)}
+                      {formatCurrency(coin.currentPrice || coin.last_price_usd || coin.price)}
                     </div>
                   </td>
                   <td className="py-4 px-4 text-right">
@@ -151,18 +154,18 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
                         <TrendingDown className="w-4 h-4" />
                       )}
                       <span className="font-medium">
-                        {formatPercentage(coin.priceChangePercentage24h)}
+                        {formatPercentage(coin.priceChangePercentage24h || coin.price_change_percentage_24h || coin.price_change_24h)}
                       </span>
                     </div>
                   </td>
                   <td className="py-4 px-4 text-right">
                     <div className="text-sm text-gray-900 dark:text-white">
-                      {formatMarketCap(coin.marketCap)}
+                      {formatMarketCap(coin.marketCap || coin.market_cap || coin.market_cap_usd)}
                     </div>
                   </td>
                   <td className="py-4 px-4 text-right">
                     <div className="text-sm text-gray-900 dark:text-white">
-                      {formatVolume(coin.totalVolume)}
+                      {formatVolume(coin.totalVolume || coin.total_volume || coin.volume_24h)}
                     </div>
                   </td>
                   {showWatchlist && (
