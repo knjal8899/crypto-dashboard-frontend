@@ -49,6 +49,28 @@ const PriceChart: React.FC<PriceChartProps> = ({
     }
   }, [initialRange])
 
+  // Normalize chart data to objects: { timestamp: number, price: number }
+  const normalizedPrices = React.useMemo(() => {
+    const raw = (chartData as any)?.prices
+    if (!raw || !Array.isArray(raw)) return [] as Array<{ timestamp: number; price: number }>
+    const toTs = (v: any): number => {
+      if (typeof v === 'number') return v
+      const parsed = Date.parse(v)
+      return Number.isNaN(parsed) ? 0 : parsed
+    }
+    return raw
+      .map((p: any) => {
+        if (Array.isArray(p)) {
+          return { timestamp: toTs(p[0]), price: Number(p[1]) }
+        }
+        if (p && typeof p === 'object') {
+          return { timestamp: toTs((p as any).timestamp), price: Number((p as any).price) }
+        }
+        return null
+      })
+      .filter(Boolean) as Array<{ timestamp: number; price: number }>
+  }, [chartData])
+
   const isPositive = priceChange24h >= 0
 
   const formatTooltipValue = (value: number) => {
@@ -64,7 +86,10 @@ const PriceChart: React.FC<PriceChartProps> = ({
       return (
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-lg">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {formatTooltipLabel(label)}
+            {(() => {
+              const date = new Date(Number(label))
+              return Number.isNaN(date.getTime()) ? '' : formatTooltipLabel(date.getTime())
+            })()}
           </p>
           <p className="text-lg font-semibold text-gray-900 dark:text-white">
             {formatTooltipValue(payload[0].value)}
@@ -115,7 +140,7 @@ const PriceChart: React.FC<PriceChartProps> = ({
     )
   }
 
-  if (!chartData || !chartData.prices || chartData.prices.length === 0) {
+  if (!normalizedPrices || normalizedPrices.length === 0) {
     return (
       <Card className={className}>
         <CardContent className="flex items-center justify-center h-64">
@@ -182,7 +207,7 @@ const PriceChart: React.FC<PriceChartProps> = ({
             <span className="text-sm text-gray-600 dark:text-gray-400">Time Range:</span>
           </div>
           <div className="flex space-x-1">
-            {CHART_TIME_RANGES.map((range) => (
+              {CHART_TIME_RANGES.map((range) => (
               <Button
                 key={range.value}
                 variant={timeRange === range.value ? 'primary' : 'outline'}
@@ -200,7 +225,7 @@ const PriceChart: React.FC<PriceChartProps> = ({
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             {chartType === 'area' ? (
-              <AreaChart data={chartData.prices}>
+              <AreaChart data={normalizedPrices}>
                 <defs>
                   <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
                     <stop
@@ -216,11 +241,10 @@ const PriceChart: React.FC<PriceChartProps> = ({
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis
-                  dataKey="timestamp"
-                  tickFormatter={(value) => formatDate(new Date(value), 'MMM dd')}
-                  stroke="#6b7280"
-                />
+                <XAxis dataKey="timestamp" tickFormatter={(value) => {
+                  const date = new Date(Number(value))
+                  return Number.isNaN(date.getTime()) ? '' : formatDate(date, 'MMM dd')
+                }} stroke="#6b7280" />
                 <YAxis
                   tickFormatter={(value) => formatCurrency(value)}
                   stroke="#6b7280"
@@ -236,13 +260,12 @@ const PriceChart: React.FC<PriceChartProps> = ({
                 />
               </AreaChart>
             ) : (
-              <LineChart data={chartData.prices}>
+              <LineChart data={normalizedPrices}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis
-                  dataKey="timestamp"
-                  tickFormatter={(value) => formatDate(new Date(value), 'MMM dd')}
-                  stroke="#6b7280"
-                />
+                <XAxis dataKey="timestamp" tickFormatter={(value) => {
+                  const date = new Date(Number(value))
+                  return Number.isNaN(date.getTime()) ? '' : formatDate(date, 'MMM dd')
+                }} stroke="#6b7280" />
                 <YAxis
                   tickFormatter={(value) => formatCurrency(value)}
                   stroke="#6b7280"
