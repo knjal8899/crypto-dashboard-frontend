@@ -43,27 +43,57 @@ const MarketOverview: React.FC = () => {
     return null
   }
 
-  const isMarketPositive = marketData.marketCapChangePercentage24h >= 0
+  // Debug: Log the market data structure
+  console.log('Market data structure:', marketData)
+
+  // Handle both array format (from market-data endpoint) and object format
+  let coins: any[] = []
+  let totalMarketCap = 0
+  let totalVolume = 0
+  let marketCapChangePercentage24h = 0
+
+  if (Array.isArray(marketData)) {
+    // If marketData is an array of coins (like top coins)
+    coins = marketData
+    totalMarketCap = coins.reduce((sum, coin) => {
+      const marketCap = parseFloat(coin.last_price_usd || coin.currentPrice || coin.price || 0) * 
+                       parseFloat(coin.circulating_supply || coin.circulatingSupply || 1000000)
+      return sum + marketCap
+    }, 0)
+    totalVolume = coins.reduce((sum, coin) => {
+      return sum + parseFloat(coin.last_volume_24h_usd || coin.totalVolume || coin.volume_24h || 0)
+    }, 0)
+    marketCapChangePercentage24h = coins.length > 0 ? 
+      coins.reduce((sum, coin) => sum + parseFloat(coin.last_pct_change_24h || coin.priceChangePercentage24h || 0), 0) / coins.length : 0
+  } else if (marketData && typeof marketData === 'object') {
+    // If marketData is an object with aggregated data
+    coins = marketData.coins || []
+    totalMarketCap = marketData.totalMarketCap || marketData.total_market_cap || marketData.market_cap || 0
+    totalVolume = marketData.totalVolume || marketData.total_volume || marketData.volume_24h || 0
+    marketCapChangePercentage24h = marketData.marketCapChangePercentage24h || marketData.market_cap_change_percentage_24h || 0
+  }
+
+  const isMarketPositive = marketCapChangePercentage24h >= 0
 
   const stats = [
     {
       title: 'Total Market Cap',
-      value: formatMarketCap(marketData.totalMarketCap),
-      change: marketData.marketCapChangePercentage24h,
+      value: formatMarketCap(totalMarketCap),
+      change: marketCapChangePercentage24h,
       icon: DollarSign,
       color: 'text-blue-600 dark:text-blue-400',
     },
     {
       title: '24h Volume',
-      value: formatMarketCap(marketData.totalVolume),
+      value: formatMarketCap(totalVolume),
       change: 0, // Volume change not provided in the data
       icon: BarChart3,
       color: 'text-green-600 dark:text-green-400',
     },
     {
       title: 'Market Change',
-      value: formatPercentage(marketData.marketCapChangePercentage24h),
-      change: marketData.marketCapChangePercentage24h,
+      value: formatPercentage(marketCapChangePercentage24h),
+      change: marketCapChangePercentage24h,
       icon: isMarketPositive ? TrendingUp : TrendingDown,
       color: isMarketPositive 
         ? 'text-green-600 dark:text-green-400' 
@@ -71,7 +101,7 @@ const MarketOverview: React.FC = () => {
     },
     {
       title: 'Active Coins',
-      value: marketData.coins.length.toString(),
+      value: coins.length.toString(),
       change: 0,
       icon: TrendingUp,
       color: 'text-purple-600 dark:text-purple-400',

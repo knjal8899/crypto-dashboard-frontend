@@ -268,7 +268,7 @@ const Dashboard: React.FC = () => {
                             className="w-6 h-6 rounded-full"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement
-                              target.src = `https://via.placeholder.com/24x24/6366f1/ffffff?text=${coin.symbol.charAt(0)}`
+                              target.src = `data:image/svg+xml;base64,${btoa(`<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="#6366f1"/><text x="12" y="16" text-anchor="middle" fill="white" font-family="Arial" font-size="10" font-weight="bold">${(coin.symbol || '?').charAt(0)}</text></svg>`)}`
                             }}
                           />
                           <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -314,7 +314,7 @@ const Dashboard: React.FC = () => {
                             className="w-6 h-6 rounded-full"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement
-                              target.src = `https://via.placeholder.com/24x24/6366f1/ffffff?text=${coin.symbol.charAt(0)}`
+                              target.src = `data:image/svg+xml;base64,${btoa(`<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="#6366f1"/><text x="12" y="16" text-anchor="middle" fill="white" font-family="Arial" font-size="10" font-weight="bold">${(coin.symbol || '?').charAt(0)}</text></svg>`)}`
                             }}
                           />
                           <span className="text-sm font-medium text-gray-900 dark:text-white">

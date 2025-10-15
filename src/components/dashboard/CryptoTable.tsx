@@ -121,12 +121,12 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
                       onClick={() => onCoinSelect?.(coin.id)}
                     >
                       <img
-                        src={coin.image || `https://via.placeholder.com/32x32/6366f1/ffffff?text=${(coin.symbol || '?').charAt(0)}`}
+                        src={coin.image || `data:image/svg+xml;base64,${btoa(`<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="#6366f1"/><text x="16" y="20" text-anchor="middle" fill="white" font-family="Arial" font-size="14" font-weight="bold">${(coin.symbol || '?').charAt(0)}</text></svg>`)}`}
                         alt={coin.name || 'Unknown'}
                         className="w-8 h-8 rounded-full"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
-                          target.src = `https://via.placeholder.com/32x32/6366f1/ffffff?text=${(coin.symbol || '?').charAt(0)}`
+                          target.src = `data:image/svg+xml;base64,${btoa(`<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" fill="#6366f1"/><text x="16" y="20" text-anchor="middle" fill="white" font-family="Arial" font-size="14" font-weight="bold">${(coin.symbol || '?').charAt(0)}</text></svg>`)}`
                         }}
                       />
                       <div>
