@@ -15,6 +15,7 @@ import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import Dashboard from '@/pages/Dashboard'
 import CoinDetail from '@/pages/CoinDetail'
+import Watchlist from '@/pages/Watchlist'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -76,6 +77,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <CoinDetail />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/watchlist"
+                  element={
+                    <ProtectedRoute>
+                      <Watchlist />
                     </ProtectedRoute>
                   }
                 />

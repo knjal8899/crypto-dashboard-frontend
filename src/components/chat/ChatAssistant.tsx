@@ -56,8 +56,24 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({
     try {
       // Try GET /chat/query first for Q&A coin search
       const qa = await queryMutation.mutateAsync(userMessage.content)
-      if (qa && (qa.answer || qa.prices)) {
-        const answerText = qa.answer || 'Here is the data you requested.'
+      if (qa && (qa.answer || qa.prices || qa.price_usd)) {
+        // Build a richer answer from structured fields
+        let parts: string[] = []
+        if (qa.answer) parts.push(qa.answer)
+        if (qa.coin && qa.price_usd) {
+          parts.push(`Current ${qa.coin} price: $${Number(qa.price_usd).toLocaleString()}`)
+        }
+        if (Array.isArray(qa.prices) && qa.prices.length > 1) {
+          const first = Number(qa.prices[0][1])
+          const last = Number(qa.prices[qa.prices.length - 1][1])
+          if (Number.isFinite(first) && Number.isFinite(last) && first > 0) {
+            const pct = ((last - first) / first) * 100
+            const days = qa.days || 7
+            const sign = pct >= 0 ? '+' : ''
+            parts.push(`Price change: ${sign}${pct.toFixed(2)}% over ${days} days`)
+          }
+        }
+        const answerText = parts.join('\n\n') || 'Here is the data you requested.'
         const assistantMsg: ChatMessage = {
           id: Date.now().toString(),
           content: answerText,
