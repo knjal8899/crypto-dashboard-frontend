@@ -1,0 +1,194 @@
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { TrendingUp, TrendingDown, Star, StarOff, Plus, Minus } from 'lucide-react'
+import { formatCurrency, formatPercentage, formatMarketCap, formatVolume } from '@/utils/format'
+import { useTopCoins, useAddToWatchlist, useRemoveFromWatchlist } from '@/hooks'
+import { Button, Badge, Skeleton, SkeletonTable } from '@/components/ui'
+import { CryptoCoin } from '@/types'
+
+interface CryptoTableProps {
+  limit?: number
+  showWatchlist?: boolean
+  className?: string
+  onCoinSelect?: (coinId: string) => void
+}
+
+const CryptoTable: React.FC<CryptoTableProps> = ({ 
+  limit = 10, 
+  showWatchlist = true,
+  className,
+  onCoinSelect
+}) => {
+  const [watchlist, setWatchlist] = useState<string[]>([])
+  const { data: coins, isLoading, error } = useTopCoins(limit)
+  const addToWatchlistMutation = useAddToWatchlist()
+  const removeFromWatchlistMutation = useRemoveFromWatchlist()
+
+  const handleWatchlistToggle = async (coinId: string) => {
+    const isInWatchlist = watchlist.includes(coinId)
+    
+    try {
+      if (isInWatchlist) {
+        await removeFromWatchlistMutation.mutateAsync(coinId)
+        setWatchlist(prev => prev.filter(id => id !== coinId))
+      } else {
+        await addToWatchlistMutation.mutateAsync(coinId)
+        setWatchlist(prev => [...prev, coinId])
+      }
+    } catch (error) {
+      console.error('Watchlist toggle failed:', error)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className={className}>
+        <SkeletonTable rows={limit} columns={6} />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className={`text-center py-8 ${className}`}>
+        <p className="text-red-600 dark:text-red-400">
+          Failed to load crypto data. Please try again.
+        </p>
+      </div>
+    )
+  }
+
+  if (!coins || coins.length === 0) {
+    return (
+      <div className={`text-center py-8 ${className}`}>
+        <p className="text-gray-600 dark:text-gray-400">
+          No crypto data available.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className={`overflow-hidden ${className}`}>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">
+                #
+              </th>
+              <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">
+                Coin
+              </th>
+              <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-400">
+                Price
+              </th>
+              <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-400">
+                24h Change
+              </th>
+              <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-400">
+                Market Cap
+              </th>
+              <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-400">
+                Volume
+              </th>
+              {showWatchlist && (
+                <th className="text-center py-3 px-4 font-medium text-gray-600 dark:text-gray-400">
+                  Actions
+                </th>
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {coins.map((coin) => {
+              const isPositive = coin.priceChangePercentage24h >= 0
+              const isInWatchlist = watchlist.includes(coin.id)
+              
+              return (
+                <tr
+                  key={coin.id}
+                  className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                >
+                  <td className="py-4 px-4 text-sm text-gray-600 dark:text-gray-400">
+                    {coin.marketCapRank}
+                  </td>
+                  <td className="py-4 px-4">
+                    <div
+                      className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer"
+                      onClick={() => onCoinSelect?.(coin.id)}
+                    >
+                      <img
+                        src={coin.image}
+                        alt={coin.name}
+                        className="w-8 h-8 rounded-full"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.src = `https://via.placeholder.com/32x32/6366f1/ffffff?text=${coin.symbol.charAt(0)}`
+                        }}
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900 dark:text-white">
+                          {coin.name}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {coin.symbol.toUpperCase()}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <div className="font-medium text-gray-900 dark:text-white">
+                      {formatCurrency(coin.currentPrice)}
+                    </div>
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <div className={`flex items-center justify-end space-x-1 ${
+                      isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                    }`}>
+                      {isPositive ? (
+                        <TrendingUp className="w-4 h-4" />
+                      ) : (
+                        <TrendingDown className="w-4 h-4" />
+                      )}
+                      <span className="font-medium">
+                        {formatPercentage(coin.priceChangePercentage24h)}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <div className="text-sm text-gray-900 dark:text-white">
+                      {formatMarketCap(coin.marketCap)}
+                    </div>
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <div className="text-sm text-gray-900 dark:text-white">
+                      {formatVolume(coin.totalVolume)}
+                    </div>
+                  </td>
+                  {showWatchlist && (
+                    <td className="py-4 px-4 text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleWatchlistToggle(coin.id)}
+                        className="p-2"
+                      >
+                        {isInWatchlist ? (
+                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                        ) : (
+                          <StarOff className="w-4 h-4 text-gray-400" />
+                        )}
+                      </Button>
+                    </td>
+                  )}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+export default CryptoTable
