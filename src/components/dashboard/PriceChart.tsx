@@ -176,7 +176,7 @@ const PriceChart: React.FC<PriceChartProps> = ({
                   <TrendingDown className="w-4 h-4" />
                 )}
                 <span className="font-medium">
-                  {formatCurrency(priceChange24h)} ({formatCurrency(priceChangePercentage24h)}%)
+                  {formatCurrency(priceChange24h)} ({formatPercentage(priceChangePercentage24h)})
                 </span>
               </div>
             </div>

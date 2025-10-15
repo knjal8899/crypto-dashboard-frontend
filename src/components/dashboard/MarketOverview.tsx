@@ -101,13 +101,15 @@ const MarketOverview: React.FC = () => {
     },
     {
       title: 'Active Coins',
-      value: (
-        (Array.isArray((marketData as any)?.coins) ? (marketData as any).coins.length : undefined)
-        ?? Number((marketData as any)?.active_cryptocurrencies)
-        ?? Number((marketData as any)?.active_cryptocurrencies_count)
-        ?? coins.length
-        ?? 0
-      ).toString(),
+      value: (() => {
+        const coinsArray = Array.isArray((marketData as any)?.coins) ? (marketData as any).coins : []
+        const activeCount = Number((marketData as any)?.active_cryptocurrencies) || 
+                           Number((marketData as any)?.active_cryptocurrencies_count) || 
+                           coinsArray.length || 
+                           coins.length || 
+                           0
+        return isNaN(activeCount) ? '0' : activeCount.toString()
+      })(),
       change: 0,
       icon: TrendingUp,
       color: 'text-purple-600 dark:text-purple-400',

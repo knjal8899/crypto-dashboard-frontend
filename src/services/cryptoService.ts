@@ -46,7 +46,7 @@ export const cryptoService = {
   },
 
   async addToWatchlist(coinId: string): Promise<void> {
-    return apiClient.post<void>(`/coins/watchlist/${coinId}`)
+    return apiClient.post<void>(`/coins/watchlist/${coinId}`, {})
   },
 
   async removeFromWatchlist(coinId: string): Promise<void> {

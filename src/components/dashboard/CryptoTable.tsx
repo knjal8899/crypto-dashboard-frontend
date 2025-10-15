@@ -40,8 +40,14 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
         await addToWatchlistMutation.mutateAsync(coinId)
         setWatchlist(prev => [...prev, coinId])
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Watchlist toggle failed:', error)
+      // Show user-friendly error message
+      const errorMessage = error?.response?.data?.detail || 
+                          error?.response?.data?.message || 
+                          error?.message || 
+                          'Failed to update watchlist'
+      alert(`Error: ${errorMessage}`)
     }
   }
 
