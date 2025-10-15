@@ -70,7 +70,24 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({
             const pct = ((last - first) / first) * 100
             const days = qa.days || 7
             const sign = pct >= 0 ? '+' : ''
-            parts.push(`Price change: ${sign}${pct.toFixed(2)}% over ${days} days`)
+            
+            // Check if user asked for 24h change specifically
+            const is24hQuery = userMessage.content.toLowerCase().includes('24h') || userMessage.content.toLowerCase().includes('24 hour')
+            if (is24hQuery && days > 1) {
+              // For 24h queries, try to get the most recent price change
+              // If we have multiple data points, calculate 24h change from recent data
+              if (qa.prices.length >= 2) {
+                const recent = Number(qa.prices[qa.prices.length - 1][1])
+                const dayBefore = Number(qa.prices[Math.max(0, qa.prices.length - 2)][1])
+                if (Number.isFinite(recent) && Number.isFinite(dayBefore) && dayBefore > 0) {
+                  const dayChange = ((recent - dayBefore) / dayBefore) * 100
+                  const daySign = dayChange >= 0 ? '+' : ''
+                  parts.push(`24h change: ${daySign}${dayChange.toFixed(2)}%`)
+                }
+              }
+            } else {
+              parts.push(`Price change: ${sign}${pct.toFixed(2)}% over ${days} days`)
+            }
           }
         }
         const answerText = parts.join('\n\n') || 'Here is the data you requested.'

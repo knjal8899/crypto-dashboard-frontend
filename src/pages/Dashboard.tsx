@@ -144,9 +144,9 @@ const Dashboard: React.FC = () => {
                 coinId={selectedCoinData.id}
                 coinName={selectedCoinData.name}
                 coinSymbol={selectedCoinData.symbol}
-                currentPrice={selectedCoinData.currentPrice}
-                priceChange24h={selectedCoinData.priceChange24h}
-                priceChangePercentage24h={selectedCoinData.priceChangePercentage24h}
+                currentPrice={selectedCoinData.currentPrice || selectedCoinData.last_price_usd || selectedCoinData.price}
+                priceChange24h={selectedCoinData.priceChange24h || 0}
+                priceChangePercentage24h={selectedCoinData.priceChangePercentage24h || selectedCoinData.last_pct_change_24h || 0}
                 initialRange={selectedRange}
                 showControls={true}
                 availableCoins={Array.isArray(topCoins) ? topCoins : []}
