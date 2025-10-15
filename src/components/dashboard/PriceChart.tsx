@@ -24,6 +24,7 @@ interface PriceChartProps {
   priceChange24h: number
   priceChangePercentage24h: number
   className?: string
+  initialRange?: '1d' | '7d' | '30d' | '90d' | '1y' | 'max'
 }
 
 const PriceChart: React.FC<PriceChartProps> = ({
@@ -33,12 +34,20 @@ const PriceChart: React.FC<PriceChartProps> = ({
   currentPrice,
   priceChange24h,
   priceChangePercentage24h,
-  className
+  className,
+  initialRange
 }) => {
-  const [timeRange, setTimeRange] = useState<'1d' | '7d' | '30d' | '90d' | '1y' | 'max'>('7d')
+  const [timeRange, setTimeRange] = useState<'1d' | '7d' | '30d' | '90d' | '1y' | 'max'>(initialRange || '7d')
   const [chartType, setChartType] = useState<'line' | 'area'>('area')
   
   const { data: chartData, isLoading, error } = useCoinPriceHistory(coinId, timeRange)
+
+  // Sync with external initialRange changes
+  React.useEffect(() => {
+    if (initialRange) {
+      setTimeRange(initialRange)
+    }
+  }, [initialRange])
 
   const isPositive = priceChange24h >= 0
 

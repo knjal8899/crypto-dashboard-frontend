@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { TrendingUp, TrendingDown, Star, BarChart3 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import MarketOverview from '@/components/dashboard/MarketOverview'
@@ -11,6 +11,7 @@ import { formatCurrency, formatPercentage } from '@/utils/format'
 
 const Dashboard: React.FC = () => {
   const [selectedCoin, setSelectedCoin] = useState<string | null>(null)
+  const [selectedRange, setSelectedRange] = useState<'1d' | '7d' | '30d' | '90d' | '1y'>('7d')
   const [showChat, setShowChat] = useState(false)
   
   const { data: topCoins, isLoading: topCoinsLoading, error: topCoinsError } = useTopCoins(10)
@@ -20,7 +21,16 @@ const Dashboard: React.FC = () => {
     setSelectedCoin(coinId)
   }
 
-  const selectedCoinData = Array.isArray(topCoins) ? topCoins.find(coin => coin.id === selectedCoin) : null
+  const firstCoinId = useMemo(() => (Array.isArray(topCoins) && topCoins.length > 0 ? topCoins[0].id : null), [topCoins])
+  useEffect(() => {
+    if (!selectedCoin && firstCoinId) {
+      setSelectedCoin(firstCoinId)
+    }
+  }, [firstCoinId, selectedCoin])
+
+  const selectedCoinData = useMemo(() => (
+    Array.isArray(topCoins) ? topCoins.find(coin => coin.id === selectedCoin) : null
+  ), [topCoins, selectedCoin])
 
   // Show loading state while data is being fetched
   if (topCoinsLoading) {
@@ -137,6 +147,7 @@ const Dashboard: React.FC = () => {
                 currentPrice={selectedCoinData.currentPrice}
                 priceChange24h={selectedCoinData.priceChange24h}
                 priceChangePercentage24h={selectedCoinData.priceChangePercentage24h}
+                initialRange={selectedRange}
               />
             ) : (
               <Card>
@@ -150,6 +161,45 @@ const Dashboard: React.FC = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Coin and Range Selectors */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Chart Controls</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Coin</label>
+                    <select
+                      className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-3 py-2 text-gray-900 dark:text-white"
+                      value={selectedCoin || ''}
+                      onChange={(e) => setSelectedCoin(e.target.value)}
+                    >
+                      {(Array.isArray(topCoins) ? topCoins : []).map((coin: any) => (
+                        <option key={coin.id} value={coin.id}>
+                          {coin.name} ({(coin.symbol || '').toUpperCase()})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="w-full sm:w-48">
+                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Range</label>
+                    <select
+                      className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-3 py-2 text-gray-900 dark:text-white"
+                      value={selectedRange}
+                      onChange={(e) => setSelectedRange(e.target.value as any)}
+                    >
+                      <option value="1d">1 Day</option>
+                      <option value="7d">7 Days</option>
+                      <option value="30d">30 Days</option>
+                      <option value="90d">90 Days</option>
+                      <option value="1y">1 Year</option>
+                    </select>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Top Cryptocurrencies Table */}
             <Card>
