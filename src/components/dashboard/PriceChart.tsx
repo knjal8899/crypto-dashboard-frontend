@@ -25,6 +25,9 @@ interface PriceChartProps {
   priceChangePercentage24h: number
   className?: string
   initialRange?: '1d' | '7d' | '30d' | '90d' | '1y' | 'max'
+  showControls?: boolean
+  availableCoins?: any[]
+  onCoinChange?: (coinId: string) => void
 }
 
 const PriceChart: React.FC<PriceChartProps> = ({
@@ -35,7 +38,10 @@ const PriceChart: React.FC<PriceChartProps> = ({
   priceChange24h,
   priceChangePercentage24h,
   className,
-  initialRange
+  initialRange,
+  showControls = false,
+  availableCoins = [],
+  onCoinChange
 }) => {
   const [timeRange, setTimeRange] = useState<'1d' | '7d' | '30d' | '90d' | '1y' | 'max'>(initialRange || '7d')
   const [chartType, setChartType] = useState<'line' | 'area'>('area')
@@ -200,26 +206,64 @@ const PriceChart: React.FC<PriceChartProps> = ({
         </div>
       </CardHeader>
       <CardContent>
-        {/* Time Range Selector */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-2">
-            <Calendar className="w-4 h-4 text-gray-500" />
-            <span className="text-sm text-gray-600 dark:text-gray-400">Time Range:</span>
+        {/* Chart Controls */}
+        {showControls && (
+          <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Coin</label>
+                <select
+                  className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-3 py-2 text-gray-900 dark:text-white"
+                  value={coinId}
+                  onChange={(e) => onCoinChange?.(e.target.value)}
+                >
+                  {availableCoins.map((coin: any) => (
+                    <option key={coin.id} value={coin.id}>
+                      {coin.name} ({(coin.symbol || '').toUpperCase()})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-full sm:w-48">
+                <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Time Range</label>
+                <select
+                  className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-3 py-2 text-gray-900 dark:text-white"
+                  value={timeRange}
+                  onChange={(e) => setTimeRange(e.target.value as any)}
+                >
+                  {CHART_TIME_RANGES.map((range) => (
+                    <option key={range.value} value={range.value}>
+                      {range.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
-          <div className="flex space-x-1">
-              {CHART_TIME_RANGES.map((range) => (
-              <Button
-                key={range.value}
-                variant={timeRange === range.value ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setTimeRange(range.value as any)}
-                className="text-xs"
-              >
-                {range.label}
-              </Button>
-            ))}
+        )}
+
+        {/* Time Range Selector (compact version when controls are shown) */}
+        {!showControls && (
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-2">
+              <Calendar className="w-4 h-4 text-gray-500" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">Time Range:</span>
+            </div>
+            <div className="flex space-x-1">
+                {CHART_TIME_RANGES.map((range) => (
+                <Button
+                  key={range.value}
+                  variant={timeRange === range.value ? 'primary' : 'outline'}
+                  size="sm"
+                  onClick={() => setTimeRange(range.value as any)}
+                  className="text-xs"
+                >
+                  {range.label}
+                </Button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Chart */}
         <div className="h-64 w-full">

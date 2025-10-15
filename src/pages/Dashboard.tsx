@@ -137,47 +137,8 @@ const Dashboard: React.FC = () => {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Charts and Top Coins */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Chart Controls (above chart) */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Chart Controls</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1">
-                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Coin</label>
-                    <select
-                      className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-3 py-2 text-gray-900 dark:text-white"
-                      value={selectedCoin || ''}
-                      onChange={(e) => setSelectedCoin(e.target.value)}
-                    >
-                      {(Array.isArray(topCoins) ? topCoins : []).map((coin: any) => (
-                        <option key={coin.id} value={coin.id}>
-                          {coin.name} ({(coin.symbol || '').toUpperCase()})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="w-full sm:w-48">
-                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Range</label>
-                    <select
-                      className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-3 py-2 text-gray-900 dark:text-white"
-                      value={selectedRange}
-                      onChange={(e) => setSelectedRange(e.target.value as any)}
-                    >
-                      <option value="1d">1 Day</option>
-                      <option value="7d">7 Days</option>
-                      <option value="30d">30 Days</option>
-                      <option value="90d">90 Days</option>
-                      <option value="1y">1 Year</option>
-                    </select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Price Chart */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Price Chart with integrated controls */}
             {selectedCoinData ? (
               <PriceChart
                 coinId={selectedCoinData.id}
@@ -187,6 +148,9 @@ const Dashboard: React.FC = () => {
                 priceChange24h={selectedCoinData.priceChange24h}
                 priceChangePercentage24h={selectedCoinData.priceChangePercentage24h}
                 initialRange={selectedRange}
+                showControls={true}
+                availableCoins={Array.isArray(topCoins) ? topCoins : []}
+                onCoinChange={setSelectedCoin}
               />
             ) : (
               <Card>
@@ -203,16 +167,16 @@ const Dashboard: React.FC = () => {
 
             {/* Top Cryptocurrencies Table */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center space-x-2 text-lg">
                   <BarChart3 className="h-5 w-5" />
                   <span>Top Cryptocurrencies</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="max-h-[28rem] overflow-auto">
+              <CardContent className="pt-0">
+                <div className="max-h-[20rem] overflow-auto">
                   <CryptoTable 
-                    limit={50}
+                    limit={20}
                     showWatchlist={true}
                     onCoinSelect={handleCoinSelect}
                   />
@@ -222,19 +186,20 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Right Column - Sidebar */}
-          <div className="space-y-8">
-            {/* Move Chat Assistant above Gainers */}
-            <div className="sticky top-8">
+          <div className="space-y-6">
+            {/* Chat Assistant - more compact */}
+            <div className="sticky top-4">
               <ChatAssistant 
                 isOpen={showChat}
                 onClose={() => setShowChat(false)}
-                className="h-96"
+                className="h-80"
               />
               {!showChat && (
                 <Button
                   onClick={() => setShowChat(true)}
                   className="w-full"
                   variant="outline"
+                  size="sm"
                 >
                   <Star className="h-4 w-4 mr-2" />
                   Open Chat Assistant
@@ -245,13 +210,13 @@ const Dashboard: React.FC = () => {
 
             {/* Top Gainers */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center space-x-2 text-lg">
                   <TrendingUp className="h-5 w-5 text-green-600" />
                   <span>Top Gainers</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 {gainersLosersLoading ? (
                   <div className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -291,13 +256,13 @@ const Dashboard: React.FC = () => {
 
             {/* Top Losers */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center space-x-2 text-lg">
                   <TrendingDown className="h-5 w-5 text-red-600" />
                   <span>Top Losers</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 {gainersLosersLoading ? (
                   <div className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (

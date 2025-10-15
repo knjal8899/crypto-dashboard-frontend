@@ -1,13 +1,36 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import Header from '@/components/layout/Header'
-import { useWatchlist, useRemoveFromWatchlist } from '@/hooks'
+import { useWatchlist, useRemoveFromWatchlist, useTopCoins } from '@/hooks'
 import { Card, CardContent, CardHeader, CardTitle, Button, Skeleton } from '@/components/ui'
 import { formatCurrency, formatMarketCap, formatPercentage } from '@/utils/format'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 
 const Watchlist: React.FC = () => {
-  const { data: coins, isLoading, error } = useWatchlist()
+  const { data: watchlistIds, isLoading: watchlistLoading, error: watchlistError } = useWatchlist()
+  const { data: allCoins, isLoading: coinsLoading } = useTopCoins(100) // Get more coins to match watchlist
   const removeMutation = useRemoveFromWatchlist()
+
+  // Match watchlist IDs with full coin data
+  const coins = useMemo(() => {
+    if (!watchlistIds || !allCoins) return []
+    
+    // Handle both array of IDs and array of coin objects
+    if (Array.isArray(watchlistIds)) {
+      if (watchlistIds.length > 0 && typeof watchlistIds[0] === 'string') {
+        // Array of IDs: ["bitcoin", "ethereum", ...]
+        return watchlistIds
+          .map((id: string) => allCoins.find((coin: any) => coin.id === id))
+          .filter(Boolean)
+      } else {
+        // Array of coin objects: [{id: "bitcoin", name: "Bitcoin", ...}, ...]
+        return watchlistIds
+      }
+    }
+    return []
+  }, [watchlistIds, allCoins])
+
+  const isLoading = watchlistLoading || coinsLoading
+  const error = watchlistError
 
   const handleRemove = async (coinId: string) => {
     try {
