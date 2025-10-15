@@ -8,6 +8,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import PublicRoute from '@/components/auth/PublicRoute'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 // Pages
 import Login from '@/pages/Login'
@@ -39,8 +40,9 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <Router>
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-              <Routes>
+            <ErrorBoundary>
+              <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+                <Routes>
                 {/* Public Routes */}
                 <Route
                   path="/login"
@@ -100,7 +102,8 @@ function App() {
                   },
                 }}
               />
-            </div>
+              </div>
+            </ErrorBoundary>
           </Router>
         </AuthProvider>
       </ThemeProvider>

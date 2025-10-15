@@ -6,7 +6,25 @@ import { CryptoCoin, CryptoChartData, CryptoMarketData } from '@/types'
 export function useTopCoins(limit: number = 10) {
   return useQuery({
     queryKey: [...QUERY_KEYS.CRYPTO.TOP_COINS, limit],
-    queryFn: () => cryptoService.getTopCoins(limit),
+    queryFn: async () => {
+      try {
+        const data = await cryptoService.getTopCoins(limit)
+        console.log('Top coins API response:', data)
+        
+        // Ensure we return an array
+        if (Array.isArray(data)) {
+          return data
+        } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+          return data.data
+        } else {
+          console.error('Unexpected API response format:', data)
+          return []
+        }
+      } catch (error) {
+        console.error('Error fetching top coins:', error)
+        throw error
+      }
+    },
     staleTime: 30000, // 30 seconds
     refetchInterval: 60000, // 1 minute
   })
@@ -33,7 +51,16 @@ export function useCoinPriceHistory(id: string, timeRange: '1d' | '7d' | '30d' |
 export function useMarketData() {
   return useQuery({
     queryKey: QUERY_KEYS.CRYPTO.MARKET_DATA,
-    queryFn: cryptoService.getMarketData,
+    queryFn: async () => {
+      try {
+        const data = await cryptoService.getMarketData()
+        console.log('Market data API response:', data)
+        return data
+      } catch (error) {
+        console.error('Error fetching market data:', error)
+        throw error
+      }
+    },
     staleTime: 30000,
     refetchInterval: 60000,
   })
@@ -50,7 +77,16 @@ export function useTrendingCoins() {
 export function useGainersLosers() {
   return useQuery({
     queryKey: QUERY_KEYS.CRYPTO.GAINERS_LOSERS,
-    queryFn: cryptoService.getGainersLosers,
+    queryFn: async () => {
+      try {
+        const data = await cryptoService.getGainersLosers()
+        console.log('Gainers/Losers API response:', data)
+        return data
+      } catch (error) {
+        console.error('Error fetching gainers/losers:', error)
+        throw error
+      }
+    },
     staleTime: 300000, // 5 minutes
   })
 }

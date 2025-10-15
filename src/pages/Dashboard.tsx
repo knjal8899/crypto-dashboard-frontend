@@ -20,7 +20,7 @@ const Dashboard: React.FC = () => {
     setSelectedCoin(coinId)
   }
 
-  const selectedCoinData = topCoins?.find(coin => coin.id === selectedCoin)
+  const selectedCoinData = Array.isArray(topCoins) ? topCoins.find(coin => coin.id === selectedCoin) : null
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
                       </div>
                     ))}
                   </div>
-                ) : topCoins ? (
+                ) : Array.isArray(topCoins) && topCoins.length > 0 ? (
                   <>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
