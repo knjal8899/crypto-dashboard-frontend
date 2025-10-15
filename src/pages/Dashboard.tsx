@@ -7,7 +7,7 @@ import PriceChart from '@/components/dashboard/PriceChart'
 import ChatAssistant from '@/components/chat/ChatAssistant'
 import { useTopCoins, useGainersLosers } from '@/hooks'
 import { Card, CardContent, CardHeader, CardTitle, Button, LoadingSpinner } from '@/components/ui'
-import { formatCurrency, formatPercentage } from '@/utils/format'
+import { formatPercentage } from '@/utils/format'
 
 const Dashboard: React.FC = () => {
   const [selectedCoin, setSelectedCoin] = useState<string | null>(null)
@@ -138,31 +138,7 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Charts and Top Coins */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Price Chart */}
-            {selectedCoinData ? (
-              <PriceChart
-                coinId={selectedCoinData.id}
-                coinName={selectedCoinData.name}
-                coinSymbol={selectedCoinData.symbol}
-                currentPrice={selectedCoinData.currentPrice}
-                priceChange24h={selectedCoinData.priceChange24h}
-                priceChangePercentage24h={selectedCoinData.priceChangePercentage24h}
-                initialRange={selectedRange}
-              />
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Price Chart</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-                    Select a coin from the table to view its price chart
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Coin and Range Selectors */}
+            {/* Chart Controls (above chart) */}
             <Card>
               <CardHeader>
                 <CardTitle>Chart Controls</CardTitle>
@@ -201,6 +177,30 @@ const Dashboard: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Price Chart */}
+            {selectedCoinData ? (
+              <PriceChart
+                coinId={selectedCoinData.id}
+                coinName={selectedCoinData.name}
+                coinSymbol={selectedCoinData.symbol}
+                currentPrice={selectedCoinData.currentPrice}
+                priceChange24h={selectedCoinData.priceChange24h}
+                priceChangePercentage24h={selectedCoinData.priceChangePercentage24h}
+                initialRange={selectedRange}
+              />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Price Chart</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                    Select a coin from the table to view its price chart
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Top Cryptocurrencies Table */}
             <Card>
               <CardHeader>
@@ -210,62 +210,20 @@ const Dashboard: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <CryptoTable 
-                  limit={10} 
-                  showWatchlist={true}
-                  onCoinSelect={handleCoinSelect}
-                />
+                <div className="max-h-[28rem] overflow-auto">
+                  <CryptoTable 
+                    limit={50}
+                    showWatchlist={true}
+                    onCoinSelect={handleCoinSelect}
+                  />
+                </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Right Column - Sidebar */}
           <div className="space-y-8">
-            {/* Quick Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Stats</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {topCoinsLoading ? (
-                  <div className="space-y-3">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="flex justify-between items-center">
-                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse" />
-                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse" />
-                      </div>
-                    ))}
-                  </div>
-                ) : Array.isArray(topCoins) && topCoins.length > 0 ? (
-                  <>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Bitcoin Dominance
-                      </span>
-                      <span className="font-medium text-gray-900 dark:text-white">
-                        {((topCoins[0]?.marketCap / (topCoins.reduce((sum, coin) => sum + coin.marketCap, 0))) * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Total Market Cap
-                      </span>
-                      <span className="font-medium text-gray-900 dark:text-white">
-                        {formatCurrency(topCoins.reduce((sum, coin) => sum + coin.marketCap, 0))}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Active Coins
-                      </span>
-                      <span className="font-medium text-gray-900 dark:text-white">
-                        {topCoins.length}
-                      </span>
-                    </div>
-                  </>
-                ) : null}
-              </CardContent>
-            </Card>
+            {/* Quick Stats section removed as requested */}
 
             {/* Top Gainers */}
             <Card>
