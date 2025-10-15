@@ -11,15 +11,24 @@ export function useTopCoins(limit: number = 10) {
         const data = await cryptoService.getTopCoins(limit)
         console.log('Top coins API response:', data)
         
-        // Ensure we return an array
+        // Ensure we return an array - handle different backend response formats
         if (Array.isArray(data)) {
           return data
-        } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
-          return data.data
-        } else {
-          console.error('Unexpected API response format:', data)
-          return []
+        } else if (data && typeof data === 'object') {
+          // Handle backend response format: {count: 10, results: [...]}
+          if (Array.isArray(data.results)) {
+            console.log('Using results array from backend response')
+            return data.results
+          }
+          // Handle alternative format: {data: [...]}
+          else if (Array.isArray(data.data)) {
+            console.log('Using data array from backend response')
+            return data.data
+          }
         }
+        
+        console.error('Unexpected API response format:', data)
+        return []
       } catch (error) {
         console.error('Error fetching top coins:', error)
         // Return empty array instead of throwing to prevent UI crashes
@@ -58,10 +67,29 @@ export function useMarketData() {
       try {
         const data = await cryptoService.getMarketData()
         console.log('Market data API response:', data)
+        
+        // Handle different response formats
+        if (data && typeof data === 'object') {
+          // If backend returns data directly
+          if (data.totalMarketCap !== undefined || data.totalVolume !== undefined) {
+            return data
+          }
+          // If backend returns {results: {...}}
+          else if (data.results && typeof data.results === 'object') {
+            return data.results
+          }
+        }
+        
         return data
       } catch (error) {
         console.error('Error fetching market data:', error)
-        throw error
+        // Return empty structure instead of throwing
+        return {
+          totalMarketCap: 0,
+          totalVolume: 0,
+          marketCapChange24h: 0,
+          activeCryptocurrencies: 0
+        }
       }
     },
     staleTime: 30000,
@@ -84,10 +112,24 @@ export function useGainersLosers() {
       try {
         const data = await cryptoService.getGainersLosers()
         console.log('Gainers/Losers API response:', data)
+        
+        // Handle different response formats
+        if (data && typeof data === 'object') {
+          // If backend returns {gainers: [...], losers: [...]} directly
+          if (Array.isArray(data.gainers) && Array.isArray(data.losers)) {
+            return data
+          }
+          // If backend returns {results: {gainers: [...], losers: [...]}}
+          else if (data.results && typeof data.results === 'object') {
+            return data.results
+          }
+        }
+        
         return data
       } catch (error) {
         console.error('Error fetching gainers/losers:', error)
-        throw error
+        // Return empty structure instead of throwing
+        return { gainers: [], losers: [] }
       }
     },
     staleTime: 300000, // 5 minutes
