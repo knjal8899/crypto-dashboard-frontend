@@ -75,7 +75,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Check if access token is expired
         if (isTokenExpired(accessToken)) {
-          console.log('Access token expired, attempting refresh...')
           try {
             const refreshResponse = await authService.refreshToken(refreshToken)
             apiClient.setTokens(refreshResponse.access, refreshResponse.refresh)
@@ -88,7 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }})
             return
           } catch (refreshError) {
-            console.error('Token refresh failed during initialization:', refreshError)
             apiClient.clearTokens()
             dispatch({ type: 'CLEAR_AUTH' })
             return
@@ -106,7 +104,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         dispatch({ type: 'SET_TOKENS', payload: { accessToken, refreshToken } })
         
       } catch (error) {
-        console.error('Auth initialization failed:', error)
         // Clear invalid tokens and mark as not authenticated
         apiClient.clearTokens()
         dispatch({ type: 'CLEAR_AUTH' })

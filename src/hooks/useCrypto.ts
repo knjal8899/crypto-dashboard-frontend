@@ -9,7 +9,6 @@ export function useTopCoins(limit: number = 10) {
     queryFn: async () => {
       try {
         const data = await cryptoService.getTopCoins(limit)
-        console.log('Top coins API response:', data)
         
         // Ensure we return an array - handle different backend response formats
         if (Array.isArray(data)) {
@@ -17,20 +16,16 @@ export function useTopCoins(limit: number = 10) {
         } else if (data && typeof data === 'object') {
           // Handle backend response format: {count: 10, results: [...]}
           if (Array.isArray(data.results)) {
-            console.log('Using results array from backend response')
             return data.results
           }
           // Handle alternative format: {data: [...]}
           else if (Array.isArray(data.data)) {
-            console.log('Using data array from backend response')
             return data.data
           }
         }
         
-        console.error('Unexpected API response format:', data)
         return []
       } catch (error) {
-        console.error('Error fetching top coins:', error)
         // Return empty array instead of throwing to prevent UI crashes
         return []
       }
@@ -66,7 +61,6 @@ export function useMarketData() {
     queryFn: async () => {
       try {
         const data = await cryptoService.getMarketData()
-        console.log('Market data API response:', data)
         
         // Handle different response formats
         if (data && typeof data === 'object') {
@@ -82,7 +76,6 @@ export function useMarketData() {
         
         return data
       } catch (error) {
-        console.error('Error fetching market data:', error)
         // Return empty structure instead of throwing
         return {
           totalMarketCap: 0,
@@ -111,7 +104,6 @@ export function useGainersLosers() {
     queryFn: async () => {
       try {
         const data = await cryptoService.getGainersLosers()
-        console.log('Gainers/Losers API response:', data)
         
         // Handle different response formats
         if (data && typeof data === 'object') {
@@ -127,7 +119,6 @@ export function useGainersLosers() {
         
         return data
       } catch (error) {
-        console.error('Error fetching gainers/losers:', error)
         // Return empty structure instead of throwing
         return { gainers: [], losers: [] }
       }

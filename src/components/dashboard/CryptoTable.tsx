@@ -101,9 +101,6 @@ const CryptoTable: React.FC<CryptoTableProps> = ({
           </thead>
           <tbody>
             {coins.map((coin) => {
-              // Debug: Log the coin structure to understand the data format
-              console.log('Coin data structure:', coin)
-              
               const isPositive = (coin.priceChangePercentage24h || 0) >= 0
               const isInWatchlist = watchlist.includes(coin.id)
               

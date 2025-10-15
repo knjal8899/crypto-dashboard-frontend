@@ -43,8 +43,6 @@ const MarketOverview: React.FC = () => {
     return null
   }
 
-  // Debug: Log the market data structure
-  console.log('Market data structure:', marketData)
 
   // Handle both array format (from market-data endpoint) and object format
   let coins: any[] = []

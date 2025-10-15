@@ -45,7 +45,6 @@ class ApiClient {
             originalRequest.headers.Authorization = `Bearer ${this.accessToken}`
             return this.instance(originalRequest)
           } catch (refreshError) {
-            console.error('Token refresh failed:', refreshError)
             this.clearTokens()
             // Only redirect if we're not already on login page
             if (window.location.pathname !== '/login') {
@@ -122,16 +121,8 @@ class ApiClient {
   }
 
   public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    try {
-      console.log('Making GET request to:', url)
-      console.log('Full URL:', `${this.instance.defaults.baseURL}${url}`)
-      const response: AxiosResponse<T> = await this.instance.get(url, config)
-      console.log('GET response:', response.data)
-      return response.data
-    } catch (error) {
-      console.error('GET request failed:', error)
-      throw error
-    }
+    const response: AxiosResponse<T> = await this.instance.get(url, config)
+    return response.data
   }
 
   public async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {

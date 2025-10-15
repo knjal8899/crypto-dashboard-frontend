@@ -5,7 +5,6 @@ import MarketOverview from '@/components/dashboard/MarketOverview'
 import CryptoTable from '@/components/dashboard/CryptoTable'
 import PriceChart from '@/components/dashboard/PriceChart'
 import ChatAssistant from '@/components/chat/ChatAssistant'
-import BackendTest from '@/components/BackendTest'
 import { useTopCoins, useGainersLosers } from '@/hooks'
 import { Card, CardContent, CardHeader, CardTitle, Button, LoadingSpinner } from '@/components/ui'
 import { formatCurrency, formatPercentage } from '@/utils/format'
@@ -15,7 +14,7 @@ const Dashboard: React.FC = () => {
   const [showChat, setShowChat] = useState(false)
   
   const { data: topCoins, isLoading: topCoinsLoading, error: topCoinsError } = useTopCoins(10)
-  const { data: gainersLosers, isLoading: gainersLosersLoading, error: gainersLosersError } = useGainersLosers()
+  const { data: gainersLosers, isLoading: gainersLosersLoading } = useGainersLosers()
 
   const handleCoinSelect = (coinId: string) => {
     setSelectedCoin(coinId)
@@ -33,7 +32,7 @@ const Dashboard: React.FC = () => {
             <div className="text-center">
               <LoadingSpinner size="lg" />
               <p className="mt-4 text-gray-600 dark:text-gray-400">
-                Loading dashboard data...
+                Loading...
               </p>
             </div>
           </div>
@@ -54,7 +53,7 @@ const Dashboard: React.FC = () => {
                 Failed to load dashboard data
               </p>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Please check your backend connection and try again
+                Please try again in a moment
               </p>
               <Button onClick={() => window.location.reload()}>
                 Retry
@@ -84,14 +83,11 @@ const Dashboard: React.FC = () => {
                   No cryptocurrency data available
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  The dashboard couldn't fetch data from the backend. This usually means:
+                  Unable to load cryptocurrency data at this time.
                 </p>
-                <ul className="text-sm text-gray-500 dark:text-gray-500 text-left space-y-1 mb-6">
-                  <li>• Backend server is not running on port 8000</li>
-                  <li>• API endpoints are not responding</li>
-                  <li>• Network connection issues</li>
-                  <li>• Authentication token issues</li>
-                </ul>
+                <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+                  Please check your connection and try again.
+                </p>
               </div>
               <div className="space-y-3">
                 <Button 
@@ -100,24 +96,6 @@ const Dashboard: React.FC = () => {
                 >
                   Retry Connection
                 </Button>
-                <Button 
-                  onClick={() => {
-                    console.log('Current API Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api')
-                    console.log('Current tokens:', {
-                      accessToken: localStorage.getItem('accessToken'),
-                      refreshToken: localStorage.getItem('refreshToken')
-                    })
-                  }}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Debug Info (Check Console)
-                </Button>
-              </div>
-              
-              {/* Backend Test Component */}
-              <div className="mt-8">
-                <BackendTest />
               </div>
             </div>
           </div>
@@ -259,7 +237,7 @@ const Dashboard: React.FC = () => {
                   </div>
                 ) : gainersLosers?.gainers ? (
                   <div className="space-y-3">
-                    {gainersLosers.gainers.slice(0, 5).map((coin) => (
+                    {gainersLosers.gainers.slice(0, 5).map((coin: any) => (
                       <div key={coin.id} className="flex justify-between items-center">
                         <div className="flex items-center space-x-2">
                           <img
@@ -305,7 +283,7 @@ const Dashboard: React.FC = () => {
                   </div>
                 ) : gainersLosers?.losers ? (
                   <div className="space-y-3">
-                    {gainersLosers.losers.slice(0, 5).map((coin) => (
+                    {gainersLosers.losers.slice(0, 5).map((coin: any) => (
                       <div key={coin.id} className="flex justify-between items-center">
                         <div className="flex items-center space-x-2">
                           <img
