@@ -13,14 +13,78 @@ const Dashboard: React.FC = () => {
   const [selectedCoin, setSelectedCoin] = useState<string | null>(null)
   const [showChat, setShowChat] = useState(false)
   
-  const { data: topCoins, isLoading: topCoinsLoading } = useTopCoins(10)
-  const { data: gainersLosers, isLoading: gainersLosersLoading } = useGainersLosers()
+  const { data: topCoins, isLoading: topCoinsLoading, error: topCoinsError } = useTopCoins(10)
+  const { data: gainersLosers, isLoading: gainersLosersLoading, error: gainersLosersError } = useGainersLosers()
 
   const handleCoinSelect = (coinId: string) => {
     setSelectedCoin(coinId)
   }
 
   const selectedCoinData = Array.isArray(topCoins) ? topCoins.find(coin => coin.id === selectedCoin) : null
+
+  // Show loading state while data is being fetched
+  if (topCoinsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <LoadingSpinner size="lg" />
+              <p className="mt-4 text-gray-600 dark:text-gray-400">
+                Loading dashboard data...
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  // Show error state if data failed to load
+  if (topCoinsError) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <p className="text-red-600 dark:text-red-400 mb-4">
+                Failed to load dashboard data
+              </p>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Please check your backend connection and try again
+              </p>
+              <Button onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  // Show empty state if no data is available
+  if (!Array.isArray(topCoins) || topCoins.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                No cryptocurrency data available
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">
+                Please ensure your backend is running and providing data
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

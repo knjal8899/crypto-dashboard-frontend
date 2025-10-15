@@ -45,8 +45,12 @@ class ApiClient {
             originalRequest.headers.Authorization = `Bearer ${this.accessToken}`
             return this.instance(originalRequest)
           } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError)
             this.clearTokens()
-            window.location.href = '/login'
+            // Only redirect if we're not already on login page
+            if (window.location.pathname !== '/login') {
+              window.location.href = '/login'
+            }
             return Promise.reject(refreshError)
           }
         }

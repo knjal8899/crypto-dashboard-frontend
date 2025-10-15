@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect, ReactNode } fr
 import { AuthState, User, LoginRequest, RegisterRequest } from '@/types'
 import { authService } from '@/services/authService'
 import apiClient from '@/lib/axios'
+import { isTokenExpired } from '@/utils/auth'
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginRequest) => Promise<void>
@@ -66,14 +67,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const accessToken = localStorage.getItem('accessToken')
         const refreshToken = localStorage.getItem('refreshToken')
 
-        if (accessToken && refreshToken) {
-          apiClient.setTokens(accessToken, refreshToken)
-          const user = await authService.getCurrentUser()
-          dispatch({ type: 'SET_USER', payload: user })
-          dispatch({ type: 'SET_TOKENS', payload: { accessToken, refreshToken } })
+        // If no tokens, user is not authenticated
+        if (!accessToken || !refreshToken) {
+          dispatch({ type: 'CLEAR_AUTH' })
+          return
         }
+
+        // Check if access token is expired
+        if (isTokenExpired(accessToken)) {
+          console.log('Access token expired, attempting refresh...')
+          try {
+            const refreshResponse = await authService.refreshToken(refreshToken)
+            apiClient.setTokens(refreshResponse.access, refreshResponse.refresh)
+            // After refresh, try to get user data
+            const user = await authService.getCurrentUser()
+            dispatch({ type: 'SET_USER', payload: user })
+            dispatch({ type: 'SET_TOKENS', payload: { 
+              accessToken: refreshResponse.access, 
+              refreshToken: refreshResponse.refresh 
+            }})
+            return
+          } catch (refreshError) {
+            console.error('Token refresh failed during initialization:', refreshError)
+            apiClient.clearTokens()
+            dispatch({ type: 'CLEAR_AUTH' })
+            return
+          }
+        }
+
+        // Set tokens in API client
+        apiClient.setTokens(accessToken, refreshToken)
+        
+        // Verify tokens are valid by fetching user data
+        const user = await authService.getCurrentUser()
+        
+        // If user fetch succeeds, user is authenticated
+        dispatch({ type: 'SET_USER', payload: user })
+        dispatch({ type: 'SET_TOKENS', payload: { accessToken, refreshToken } })
+        
       } catch (error) {
         console.error('Auth initialization failed:', error)
+        // Clear invalid tokens and mark as not authenticated
         apiClient.clearTokens()
         dispatch({ type: 'CLEAR_AUTH' })
       } finally {
